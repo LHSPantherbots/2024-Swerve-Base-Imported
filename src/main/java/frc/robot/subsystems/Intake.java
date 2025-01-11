@@ -1,33 +1,40 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
-    private final CANSparkMax m_IntakeFront;
-    private final CANSparkMax m_IntakeBack;
+    private final SparkMax m_IntakeFront;
+    private final SparkMax m_IntakeBack;
+    private final SparkMaxConfig c_IntakeFront;
+    private final SparkMaxConfig c_IntakeBack;
 
     public Intake() {
-        m_IntakeFront = new CANSparkMax(IntakeConstants.kFrontIntake, MotorType.kBrushless);
-        m_IntakeBack = new CANSparkMax(IntakeConstants.kBackIntake, MotorType.kBrushless);
+        m_IntakeFront = new SparkMax(IntakeConstants.kFrontIntake, MotorType.kBrushless);
+        m_IntakeBack = new SparkMax(IntakeConstants.kBackIntake, MotorType.kBrushless);
+        c_IntakeFront = new SparkMaxConfig();
+        c_IntakeBack = new SparkMaxConfig();
 
-        // m_IntakeFront.restoreFactoryDefaults();
-        // m_IntakeBack.restoreFactoryDefaults();
+        c_IntakeFront
+            .inverted(false)
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(30);
 
-        m_IntakeFront.setInverted(false);
-        m_IntakeBack.setInverted(false);
-
-        m_IntakeFront.setIdleMode(IdleMode.kBrake);
-        m_IntakeBack.setIdleMode(IdleMode.kBrake);
-
-        m_IntakeFront.setSmartCurrentLimit(30);
-        m_IntakeBack.setSmartCurrentLimit(30);
-
-        m_IntakeBack.follow(m_IntakeFront);
+        c_IntakeBack
+            .inverted(false)
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(30)
+            .follow(m_IntakeFront);
+        
+        m_IntakeFront.configure(c_IntakeFront, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_IntakeBack.configure(c_IntakeBack, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
