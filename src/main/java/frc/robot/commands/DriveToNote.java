@@ -7,6 +7,7 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.NoteLimeLight;
 
+@SuppressWarnings("unused")
 public class DriveToNote  extends Command {
     Feeder feeder;
     Intake intake;

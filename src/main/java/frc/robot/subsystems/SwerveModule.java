@@ -11,7 +11,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.REVPhysicsSim;
+//import com.revrobotics.REVPhysicsSim; TODO: wbilib sim
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;

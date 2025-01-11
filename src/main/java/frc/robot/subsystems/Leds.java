@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utils.RobotStatus;
 
 
+@SuppressWarnings("unused")
 public class Leds extends SubsystemBase {
   /* Creates a new leds */
 
@@ -434,22 +435,25 @@ public void purpleStreak10() {
 
 
 
+  @SuppressWarnings("static-access")
   public void setRobotStatus(RobotStatus newState){
     this.prevState = this.state;
     this.state = newState;
   }
 
+  @SuppressWarnings("static-access")
   public RobotStatus getRobotStatus(){
     return this.state;
   }
 
   public RobotStatus getPrevRobotStatus(){
-    return this.prevState;
+    return Leds.prevState;
   }
 
+  @SuppressWarnings("incomplete-switch")
   public void ledState(){
         
-    switch(this.state){
+    switch(Leds.state){
         
       case CLIMB: red(); break;
       case TARGET_LOCK: white(); break;

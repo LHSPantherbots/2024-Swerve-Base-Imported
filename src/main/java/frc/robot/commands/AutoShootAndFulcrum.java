@@ -6,6 +6,7 @@ import frc.robot.subsystems.Launcher;
 import frc.utils.Position;
 import frc.robot.subsystems.Feeder;
 
+@SuppressWarnings("unused")
 public class AutoShootAndFulcrum extends Command {
     Fulcrum fulcrum;
     Launcher launcher;

@@ -8,6 +8,7 @@ public class SparkWrapper extends SparkMax {
         super(deviceId, type);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setInverted(boolean isInverted) {
         
