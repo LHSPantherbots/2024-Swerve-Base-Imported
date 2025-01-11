@@ -1,11 +1,15 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,16 +20,18 @@ import frc.robot.Constants.LauncherConstants;
 
 public class Launcher extends SubsystemBase {
 
-    private final CANSparkFlex m_LauncherTop;
-    private final CANSparkFlex m_LauncherBottom;
-    private final RelativeEncoder m_LauncherEncoder;
-    private final RelativeEncoder m_lowerLauncherEncoder;
+    private final SparkFlex m_LauncherTop;
+    private final SparkFlex m_LauncherBottom;
+    private final SparkFlexConfig c_LauncherTop;
+    private final SparkFlexConfig c_LauncherBottom;
+    private final RelativeEncoder e_LauncherTop;
+    private final RelativeEncoder e_LauncherBottom;
 
     private double lastSetpoint = 0;
     private double setPoint = 0;
 
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, allowableError;
-    private SparkPIDController pidController;
+    private SparkClosedLoopController pidController;
 
     static InterpolatingDoubleTreeMap kDistanceToShooterSpeed = new InterpolatingDoubleTreeMap();
 
@@ -44,51 +50,45 @@ public class Launcher extends SubsystemBase {
     final DoubleSubscriber distanceSubscriber;
 
     public Launcher() {
-        m_LauncherTop = new CANSparkFlex(LauncherConstants.kLauncherTop, MotorType.kBrushless);
-        m_LauncherBottom = new CANSparkFlex(LauncherConstants.kLauncherBottom, MotorType.kBrushless);
+        m_LauncherTop = new SparkFlex(LauncherConstants.kLauncherTop, MotorType.kBrushless);
+        m_LauncherBottom = new SparkFlex(LauncherConstants.kLauncherBottom, MotorType.kBrushless);
+        c_LauncherTop = new SparkFlexConfig();
+        c_LauncherBottom = new SparkFlexConfig();
 
-        // m_LauncherTop.restoreFactoryDefaults();
-        // m_LauncherBottom.restoreFactoryDefaults(); 
+        c_LauncherTop
+            .inverted(false)
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(60);
+        c_LauncherTop.encoder
+            .quadratureMeasurementPeriod(16);
+        c_LauncherTop.absoluteEncoder
+            .averageDepth(2);
+        c_LauncherTop.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pidf(kP, kI, kD,kFF)
+            .maxOutput(kMaxOutput)
+            .minOutput(kMinOutput); 
 
-        m_LauncherTop.setInverted(false);
-        m_LauncherBottom.setInverted(false);
+        c_LauncherBottom
+            .inverted(false)
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(60)
+            .follow(m_LauncherTop);
+        c_LauncherBottom.encoder
+            .quadratureMeasurementPeriod(16);
+        c_LauncherBottom.absoluteEncoder
+            .averageDepth(2);
+        c_LauncherBottom.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pidf(kP, kI, kD,kFF)
+            .maxOutput(kMaxOutput)
+            .minOutput(kMinOutput); 
 
-        m_LauncherTop.setIdleMode(IdleMode.kBrake);
-        m_LauncherBottom.setIdleMode(IdleMode.kBrake);
+        m_LauncherTop.configure(c_LauncherTop, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_LauncherBottom.configure(c_LauncherTop, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        m_LauncherTop.setSmartCurrentLimit(60);
-        m_LauncherBottom.setSmartCurrentLimit(60);
-
-        m_LauncherBottom.follow(m_LauncherTop);
-        // m_LauncherTop.setClosedLoopRampRate(0.25);
-
-        m_LauncherEncoder = m_LauncherTop.getEncoder();
-        m_LauncherEncoder.setMeasurementPeriod(16);
-        m_LauncherEncoder.setAverageDepth(2);
-        m_lowerLauncherEncoder = m_LauncherBottom.getEncoder();
-        m_lowerLauncherEncoder.setMeasurementPeriod(16);
-        m_lowerLauncherEncoder.setAverageDepth(2);
-
-        pidController = m_LauncherTop.getPIDController();
-
-        // PID coefficients
-        kP = 0.00015;// 0.00025; //5e-5;
-        kI = 0;// 1e-6;
-        kD = 0.0008;// 0.0004;
-        kIz = 0;
-        kFF = 0.00016;// 0.00017// 0.00019;
-        kMaxOutput = 1;
-        kMinOutput = -1;
-        maxRPM = 5700;
-        allowableError = 250; // 50 //Lets the system known when the velocity is close enough to launch
-
-        // set PID coefficients
-        pidController.setP(kP);
-        pidController.setI(kI);
-        pidController.setD(kD);
-        pidController.setIZone(kIz);
-        pidController.setFF(kFF);
-        pidController.setOutputRange(kMinOutput, kMaxOutput);
+        e_LauncherTop = m_LauncherTop.getEncoder();
+        e_LauncherBottom = m_LauncherTop.getEncoder();
 
         distanceSubscriber = NetworkTableInstance.getDefault().getDoubleTopic("/Distance").subscribe(0.0);
     }
@@ -96,22 +96,15 @@ public class Launcher extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shooter Current", m_LauncherTop.getOutputCurrent());
-        SmartDashboard.putNumber("Launcer Top RPM", m_LauncherEncoder.getVelocity());
-        SmartDashboard.putNumber("Launcer Bottom RPM", m_lowerLauncherEncoder.getVelocity());
+        SmartDashboard.putNumber("Launcer Top RPM", e_LauncherTop.getVelocity());
+        SmartDashboard.putNumber("Launcer Bottom RPM", e_LauncherBottom.getVelocity());
         SmartDashboard.putNumber("Launcher SetPoint", setPoint);
         SmartDashboard.putBoolean("Launcher Is At Vel", isAtVelocity());
         SmartDashboard.putNumber("Auto RPM", getAutoShooterSpeed());
     }
 
     public void closedLoopLaunch() {
-        pidController.setP(kP);
-        pidController.setI(kI);
-        pidController.setD(kD);
-        pidController.setIZone(kI);
-        pidController.setFF(kFF);
-        pidController.setOutputRange(kMinOutput, kMaxOutput);
-
-        pidController.setReference(setPoint, CANSparkMax.ControlType.kVelocity);
+        pidController.setReference(setPoint, SparkMax.ControlType.kVelocity);
     }
 
     public void launcherRpmUp() {
@@ -165,7 +158,7 @@ public class Launcher extends SubsystemBase {
     }
 
     public boolean isAtVelocity() {
-        double error = m_LauncherEncoder.getVelocity() - setPoint;
+        double error = e_LauncherTop.getVelocity() - setPoint;
         return (Math.abs(error) < allowableError);
     }
 

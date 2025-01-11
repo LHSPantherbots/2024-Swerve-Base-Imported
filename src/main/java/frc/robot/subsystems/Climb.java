@@ -74,7 +74,8 @@ public class Climb extends SubsystemBase {
       .reverseSoftLimit(0);
 
     m_RightArm.configure(c_RightArm, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    
+    m_LeftArm.configure(c_LeftArm, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     e_RightArm = m_RightArm.getEncoder();
       e_LeftArm = m_LeftArm.getEncoder();
 
