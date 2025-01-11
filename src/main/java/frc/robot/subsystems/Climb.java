@@ -4,9 +4,12 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
 // import com.revrobotics.CANSparkBase.IdleMode;
 // import com.revrobotics.CANSparkBase.SoftLimitDirection;
@@ -21,9 +24,11 @@ import frc.robot.Constants.ClimbConstants;
 
 public class Climb extends SubsystemBase {
 
-  SparkMax m_RightArm = new SparkMax(ClimbConstants.kArmRight, MotorType.kBrushless);
-  SparkMax m_LeftArm = new SparkMax(ClimbConstants.kArmLeft, MotorType.kBrushless);
-  SparkMaxConfig c_Arm = new SparkMaxConfig();
+  private final SparkMax m_RightArm;
+  private final SparkMax m_LeftArm;
+  private final SparkMaxConfig c_RightArm;
+  private final SparkMaxConfig c_LeftArm;
+
 
   RelativeEncoder e_RightArm;
   RelativeEncoder e_LeftArm;
@@ -41,39 +46,40 @@ public class Climb extends SubsystemBase {
 
   /** Creates a new ElevatorSubsystem. */
   public Climb() {
-    // m_RightArm.restoreFactoryDefaults();
-    // m_LeftArm.restoreFactoryDefaults();
 
-    // Set limit low when starting to keep from destroying itself before tuning;
-    m_RightArm.setSmartCurrentLimit(60);
-    m_LeftArm.setSmartCurrentLimit(60);
+    m_RightArm = new SparkMax(ClimbConstants.kArmRight, MotorType.kBrushless);
+    m_LeftArm = new SparkMax(ClimbConstants.kArmLeft, MotorType.kBrushless);
+    c_RightArm = new SparkMaxConfig();
+    c_LeftArm = new SparkMaxConfig();
 
-    // Adjust this value if the arms is accellerating too fast
-    m_RightArm.setClosedLoopRampRate(0.25);
-    m_LeftArm.setClosedLoopRampRate(0.25);
+    c_RightArm
+      .inverted(true)
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(60)
+      .closedLoopRampRate(0.25);
+    c_RightArm.softLimit
+      .forwardSoftLimitEnabled(true)
+      .forwardSoftLimit(175)
+      .reverseSoftLimitEnabled(true)
+      .reverseSoftLimit(0);
+    c_LeftArm
+      .inverted(false)
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(60)
+      .closedLoopRampRate(0.25);
+    c_LeftArm.softLimit
+      .forwardSoftLimitEnabled(true)
+      .forwardSoftLimit(175)
+      .reverseSoftLimitEnabled(true)
+      .reverseSoftLimit(0);
 
-    m_RightArm.setIdleMode(IdleMode.kBrake);
-    m_LeftArm.setIdleMode(IdleMode.kBrake);
-
-    // Flip these if the elevator goes the wrong direction
-    m_RightArm.setInverted(true);
-    m_LeftArm.setInverted(false);
-
-    m_RightArm.enableSoftLimit(SoftLimitDirection.kForward, true);
-    m_RightArm.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    m_RightArm.setSoftLimit(SoftLimitDirection.kForward, 175);
-    m_RightArm.setSoftLimit(SoftLimitDirection.kReverse, 0);
-
-    m_LeftArm.enableSoftLimit(SoftLimitDirection.kForward, true);
-    m_LeftArm.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    m_LeftArm.setSoftLimit(SoftLimitDirection.kForward, 175);
-    m_LeftArm.setSoftLimit(SoftLimitDirection.kReverse, 0);
-
+    m_RightArm.configure(c_RightArm, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
     e_RightArm = m_RightArm.getEncoder();
-    e_LeftArm = m_LeftArm.getEncoder();
+      e_LeftArm = m_LeftArm.getEncoder();
 
-    m_constraints = new TrapezoidProfile.Constraints(maxVel, maxAcc);
-    m_controller = new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
+      m_constraints = new TrapezoidProfile.Constraints(maxVel, maxAcc);
+      m_controller = new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
 
     e_LeftArm.setPosition(0);
     e_RightArm.setPosition(0);
