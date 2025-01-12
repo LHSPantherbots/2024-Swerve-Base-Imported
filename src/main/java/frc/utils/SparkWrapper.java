@@ -1,4 +1,4 @@
-package frc.utils;
+/*package frc.utils;
 
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
@@ -20,8 +20,18 @@ public class SparkWrapper extends SparkMax {
         }
     }
 
+    public void setPID(double pGain, double iGain, double dGain, double fGain){
+        for (int i = 0; i <= 5; i++) {
+            super.closedLoopController.pidf(pGain,iGain,dGain,fGain);
+            if (this.sparkPID.getP() == gain) {
+                break;
+            }
+        }
+    }
+
     public SparkPIDWrapper getPIDWrapper() {
         return new SparkPIDWrapper(super.getClosedLoopController());
     }
 
 }
+    */

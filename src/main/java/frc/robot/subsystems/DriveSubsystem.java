@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.BiConsumer;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.config.PIDConstants;
+//import com.pathplanner.lib.config.ReplanningConfig;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -109,30 +112,29 @@ public class DriveSubsystem extends SubsystemBase {
           new Pose2d());
     }
 
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::resetOdometry,
-        this::getChassisSpeed,
-        this::driveRobotRelative,
-        new HolonomicPathFollowerConfig(
-            new PIDConstants(2.0, 0.0, 0.0),
-            new PIDConstants(1.75, 0.0, 0.0),
-            4.0,
-            0.4,
-            new ReplanningConfig(true, false)),
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    // AutoBuilder.configure(
+    //     this::getPose,                             TODO: This is broken due to updates on pathplanner library
+    //     this::resetOdometry,
+    //     this::getChassisSpeed,
+    //     new BiConsumer<ChassisSpeeds, DriveFeedforwards>(
+    //         new PIDConstants(2.0, 0.0, 0.0),
+    //         new PIDConstants(1.75, 0.0, 0.0),
+    //         4.0,
+    //         0.4,
+    //         new ReplanningConfig(true, false)),
+    //     () -> {
+    //       // Boolean supplier that controls when the path will be mirrored for the red
+    //       // alliance
+    //       // This will flip the path being followed to the red side of the field.
+    //       // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this);
+    //       var alliance = DriverStation.getAlliance();
+    //       if (alliance.isPresent()) {
+    //         return alliance.get() == DriverStation.Alliance.Red;
+    //       }
+    //       return false;
+    //     },
+    //     this);
 
     SmartDashboard.putData("Field", m_field);
     publisher = NetworkTableInstance.getDefault()

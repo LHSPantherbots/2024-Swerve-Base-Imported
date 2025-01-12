@@ -1,91 +1,94 @@
-package frc.utils;
+/*package frc.utils;
 
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class SparkPIDWrapper {
-    private SparkClosedLoopController sparkPID;
+    private SparkMaxConfig sparkPID;
 
-    SparkPIDWrapper(SparkClosedLoopController sparkPID) {
+    SparkPIDWrapper(SparkMaxConfig sparkPID) {
         this.sparkPID = sparkPID;
     }
 
-    public SparkClosedLoopController getSparkPIDController() {
+    public SparkMaxConfig getSparkPIDController() {
         return this.sparkPID;
     }
 
-    public void setP(double gain) {
-
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setP(gain);
-            if (this.sparkPID.getP() == gain) {
-                break;
-            }
-        }
+    public void setPID(double pGain, double iGain, double dGain, double fGain){
+            this.sparkPID.closedLoop.pidf(pGain,iGain,dGain,fGain);
     }
 
-    public void setI(double gain) {
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setI(gain);
-            if (this.sparkPID.getI() == gain) {
-                break;
-            }
-        }
-    }
+    //TODO: I GENIUELNY DON"T KNOW WHY THERE IS A FOR LOOP AND IF STATEMENT, ESPECIALLY WHEN THE IF STATEMENT IMMEDITALY BREAKS
+    // public void setP(double gain) {
 
-    public void setD(double gain) {
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setD(gain);
-            if (this.sparkPID.getD() == gain) {
-                break;
-            }
-        }
+    //     for (int i = 0; i <= 5; i++) {
+    //         this.sparkPID.setP(gain);
+    //         if (this.sparkPID.getP() == gain) {
+    //             break;
+    //         }
+    //     }
+    // }
 
-    }
+    // public void setI(double gain) {
+    //     for (int i = 0; i <= 5; i++) {
+    //         this.sparkPID.setI(gain);
+    //         if (this.sparkPID.getI() == gain) {
+    //             break;
+    //         }
+    //     }
+    // }
 
-    public void setIZone(double IZone) {
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setIZone(IZone);
-            if (this.sparkPID.getIZone() == IZone) {
-                break;
-            }
-        }
-    }
+    // public void setD(double gain) {
+    //     for (int i = 0; i <= 5; i++) {
+    //         this.sparkPID.setD(gain);
+    //         if (this.sparkPID.getD() == gain) {
+    //             break;
+    //         }
+    //     }
 
-    public void setFF(double gain) {
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setFF(gain);
-            if (this.sparkPID.getFF() == gain) {
-                break;
-            }
-        }
-    }
+    // }
+
+    // public void setIZone(double IZone) {
+    //     for (int i = 0; i <= 5; i++) {
+    //         this.sparkPID.setIZone(IZone);
+    //         if (this.sparkPID.getIZone() == IZone) {
+    //             break;
+    //         }
+    //     }
+    // }
+
+    // public void setFF(double gain) {
+    //     for (int i = 0; i <= 5; i++) {
+    //         this.sparkPID.setFF(gain);
+    //         if (this.sparkPID.getFF() == gain) {
+    //             break;
+    //         }
+    //     }
+    // }
 
     public void setOutputRange(double min, double max) {
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setOutputRange(min, max);
-            if (this.sparkPID.getOutputMin() == min && this.sparkPID.getOutputMax() == max) {
-                break;
-            }
-        }
+        this.sparkPID.closedLoop.outputRange(min, max);
     }
 
-    public void setSmartMotionMaxVelocity(double maxVal, int slotID) {
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setSmartMotionMaxVelocity(maxVal, slotID);
-            if (this.sparkPID.getSmartMotionMaxVelocity(slotID) == maxVal) {
-                break;
-            }
-        }
-    }
+    // public void setSmartMotionMaxVelocity(double maxVal, int slotID) {
+    //     this.sparkPID.closedLoop.ma
+        
+    //     for (int i = 0; i <= 5; i++) {
+    //         this.sparkPID.setSmartMotionMaxVelocity(maxVal, slotID);
+    //         if (this.sparkPID.getSmartMotionMaxVelocity(slotID) == maxVal) {
+    //             break;
+    //         }
+    //     }
+    // }
 
-    public void setSmartMotionMinOutputVelocity(double minVel, int slotID) {
-        for (int i = 0; i <= 5; i++) {
-            this.sparkPID.setSmartMotionMinOutputVelocity(minVel, slotID);
-            if (this.sparkPID.getSmartMotionMinOutputVelocity(slotID) == minVel) {
-                break;
-            }
-        }
-    }
+    // public void setSmartMotionMinOutputVelocity(double minVel, int slotID) {
+    //     for (int i = 0; i <= 5; i++) {
+    //         this.sparkPID.setSmartMotionMinOutputVelocity(minVel, slotID);
+    //         if (this.sparkPID.getSmartMotionMinOutputVelocity(slotID) == minVel) {
+    //             break;
+    //         }
+    //     }
+    // }
 
     public void setSmartMotionMaxAccel(double maxAccel, int slotID) {
         for (int i = 0; i <= 5; i++) {
@@ -132,3 +135,4 @@ public class SparkPIDWrapper {
         }
     }
 }
+*/
